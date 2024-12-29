@@ -12,8 +12,8 @@ check_service() {
 
 # Wait for multiple services
 check_service user 8000
-# check_service game 8000
-# check_service chat 8000
-# check_service frontend 3000
+check_service game 8000
+check_service chat 8000
+# check_service frontend 3000 악의 원흉
 
 exec "$@"
