@@ -2,26 +2,21 @@
 FROM nginx:latest
 
 # netcat 설치
-RUN apt-get update && apt-get install -y netcat-openbsd \
+RUN apt-get update \
+    && apt-get install -y netcat-openbsd nginx openssl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # NGINX 설정 파일 복사
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY var/www/media/avatars var/www/media/avatars
+RUN chmod -R 755 /var/www/media/avatars
 
-# SSL 인증서 및 키 파일 설정
-RUN mkdir -p /etc/nginx/ssl && \
-    printf "%s\n" "$SSL_CERT_KEY" > /etc/nginx/ssl/selfsigned.key && \
-    printf "%s\n" "$SSL_CERT_CRT" > /etc/nginx/ssl/selfsigned.crt && \
-    chmod 600 /etc/nginx/ssl/selfsigned.key && \
-    chmod 600 /etc/nginx/ssl/selfsigned.crt && \
-    chown root:root /etc/nginx/ssl/selfsigned.key /etc/nginx/ssl/selfsigned.crt
+# Nginx 초기화 스크립트 복사 및 실행 권한 부여
+COPY ./utils/init_nginx.sh /init_nginx.sh
+RUN chmod +x /init_nginx.sh
 
-# 대기 스크립트 복사
-COPY ./utils/wait-for-it.sh /wait-for-it.sh
-RUN chmod +x /wait-for-it.sh
-
-ENTRYPOINT ["/wait-for-it.sh"]
+ENTRYPOINT ["/init_nginx.sh"]
 
 # NGINX 실행
 CMD ["nginx", "-g", "daemon off;"]
