@@ -9,6 +9,7 @@ RUN apt-get update \
 
 # NGINX 설정 파일 복사
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY cors-headers.conf /etc/nginx/common/cors-headers.conf
 COPY var/www/media/avatars var/www/media/avatars
 RUN chmod -R 755 /var/www/media/avatars
 
